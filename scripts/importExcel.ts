@@ -2,6 +2,8 @@ import path from 'path';
 import fs from 'fs';
 import xlsx from 'xlsx';
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from "crypto";
+
 
 const prisma = new PrismaClient();
 
@@ -52,12 +54,45 @@ async function run() {
   const rows = parseWorkbook(resolved);
   for (const row of rows) {
     if (!row.amName || !row.month) continue;
+  
+    const email = `${row.amName.toLowerCase()}@benchmark.com`;
+  
+    const am = await prisma.accountManager.upsert({
+      where: { email },
+      update: { name: row.amName },
+      create: { name: row.amName, email },
+      select: { id: true },
+    });
+  
     await prisma.metricMonthly.upsert({
       where: { amName_month: { amName: row.amName, month: row.month } },
-      update: { ...row },
-      create: { ...row }
+      update: {
+        netRetention: row.netRetention,
+        grossRetention: row.grossRetention,
+        renewalPremium: row.renewalPremium,
+        lostPremium: row.lostPremium,
+        newBizPremium: row.newBizPremium,
+        policyCountStart: row.policyCountStart,
+        policyCountEnd: row.policyCountEnd,
+        accountManagerId: am.id,
+      },
+      create: {
+        id: randomUUID(),          // ✅ add this (fixes your error)
+        amName: row.amName,
+        month: row.month,
+        netRetention: row.netRetention,
+        grossRetention: row.grossRetention,
+        renewalPremium: row.renewalPremium,
+        lostPremium: row.lostPremium,
+        newBizPremium: row.newBizPremium,
+        policyCountStart: row.policyCountStart,
+        policyCountEnd: row.policyCountEnd,
+        accountManagerId: am.id,
+      },
     });
+    
   }
+  
   console.log(`Imported ${rows.length} rows from ${resolved}`);
 }
 
