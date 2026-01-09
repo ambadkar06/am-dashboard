@@ -114,7 +114,10 @@ export default function AmDashboardClient({
     setError(null);
 
     try {
-      const response = await fetch(`/api/metrics?accountManagerId=${accountManagerId}`);
+      const response = await fetch(
+        `/api/metrics?accountManagerId=${accountManagerId}`,
+        { cache: "no-store" }
+      );      
       const data = await response.json();
 
       if (!response.ok) {
