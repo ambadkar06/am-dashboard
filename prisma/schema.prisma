@@ -53,4 +53,6 @@ model MetricMonthly {
 
   @@index([accountManagerId])
   @@index([month])
+  @@unique([amName, month], name: "amName_month")
+
 }
