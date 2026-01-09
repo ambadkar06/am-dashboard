@@ -60,7 +60,7 @@ for (const amName of amNames) {
         // amName,
 
         // ✅ if `month` is DateTime in schema, pass an actual Date:
-        month: new Date(`${month}-01T00:00:00.000Z`),
+        month: `-01`,
 
         netRetention: Number((92 + Math.random() * 4).toFixed(2)),
         grossRetention: Number((95 + Math.random() * 3).toFixed(2)),
